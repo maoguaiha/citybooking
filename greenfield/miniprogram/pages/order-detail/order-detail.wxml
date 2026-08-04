@@ -1,0 +1,40 @@
+<view wx:if="{{order}}" class="page">
+  <view class="card">
+    <view class="status">{{order.statusLabel}}</view>
+    <view class="amount">¥{{order.amountText}}</view>
+    <view class="sub muted">{{order.serviceTitle}}</view>
+  </view>
+
+  <view class="card">
+    <view class="row"><text class="k muted">订单号</text><text class="v">{{order.orderNo}}</text></view>
+    <view class="row"><text class="k muted">撮合方式</text><text class="v">{{order.mode === 'APPOINT' ? '指定商家' : '发单抢约'}}</text></view>
+    <view class="row"><text class="k muted">服务地址</text><text class="v">{{order.address || '—'}}</text></view>
+    <view class="row"><text class="k muted">预约时间</text><text class="v">{{order.appointText || '—'}}</text></view>
+    <view class="row"><text class="k muted">下单时间</text><text class="v">{{order.timeText}}</text></view>
+    <view class="row"><text class="k muted">支付状态</text><text class="v">{{order.payStatus}}</text></view>
+  </view>
+
+  <view class="bar" wx:if="{{canPay||canCancel||canReview||canAccept||canStart||canComplete}}">
+    <button wx:if="{{canCancel}}" class="btn-ghost act" bindtap="cancel">取消订单</button>
+    <button wx:if="{{canReview}}" class="btn-ghost act" bindtap="openReview">评价</button>
+    <button wx:if="{{canAccept}}" class="btn-ghost act" bindtap="accept">接单</button>
+    <button wx:if="{{canStart}}" class="btn-ghost act" bindtap="start">开始服务</button>
+    <button wx:if="{{canComplete}}" class="btn-primary act" bindtap="complete">完成服务</button>
+    <button wx:if="{{canPay}}" class="btn-primary act" bindtap="pay">去支付</button>
+  </view>
+
+  <!-- 评价弹层 -->
+  <view wx:if="{{showReview}}" class="mask" bindtap="closeReview">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-title">服务评价</view>
+      <view class="stars">
+        <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this"
+              class="star {{score>=item?'on':''}}" data-s="{{item}}" bindtap="onScore">★</text>
+      </view>
+      <textarea class="ta" placeholder="说点什么吧～" value="{{comment}}" bindinput="onComment" />
+      <button class="btn-primary submit" bindtap="submitReview">提交评价</button>
+      <button class="btn-ghost cancel" bindtap="closeReview">取消</button>
+    </view>
+  </view>
+</view>
+<view wx:else class="empty muted">加载中…</view>

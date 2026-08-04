@@ -1,0 +1,13 @@
+.tabs { display: flex; background: #fff; border-bottom: 1rpx solid #f0f0f0; }
+.tab { flex: 1; text-align: center; padding: 24rpx 0; font-size: 28rpx; color: #4e5969; }
+.tab.on { color: #07c160; font-weight: 600; border-bottom: 4rpx solid #07c160; }
+
+.empty { text-align: center; padding: 120rpx 0; }
+.list { padding-bottom: 30rpx; }
+.order { display: block; }
+.o-head { margin-bottom: 12rpx; }
+.o-title { font-size: 32rpx; font-weight: 600; }
+.o-status { font-size: 26rpx; color: #07c160; }
+.o-row { font-size: 26rpx; margin-top: 6rpx; }
+.o-foot { margin-top: 16rpx; }
+.o-foot .price { font-size: 34rpx; }

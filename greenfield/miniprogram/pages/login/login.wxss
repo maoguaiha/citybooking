@@ -1,0 +1,28 @@
+.wrap { padding: 60rpx 40rpx; }
+.brand { text-align: center; margin-bottom: 50rpx; }
+.logo {
+  width: 120rpx; height: 120rpx; line-height: 120rpx; margin: 0 auto 20rpx;
+  background: #07c160; color: #fff; font-size: 56rpx; border-radius: 28rpx;
+}
+.title { font-size: 44rpx; font-weight: 700; }
+.sub { color: #9aa0a6; margin-top: 10rpx; }
+
+.tabs { display: flex; justify-content: center; gap: 60rpx; margin-bottom: 30rpx; }
+.tab { font-size: 32rpx; color: #9aa0a6; padding-bottom: 10rpx; }
+.tab.on { color: #07c160; font-weight: 600; border-bottom: 4rpx solid #07c160; }
+
+.form { display: block; }
+.field { display: flex; align-items: center; padding: 24rpx 0; border-bottom: 1rpx solid #f0f0f0; }
+.label { width: 120rpx; color: #1f2329; font-size: 30rpx; }
+.input { flex: 1; font-size: 30rpx; }
+.picker { flex: 1; font-size: 30rpx; color: #1f2329; }
+
+.submit { margin-top: 50rpx; }
+.divider { text-align: center; color: #c9cdd4; font-size: 26rpx; margin: 30rpx 0; position: relative; }
+.divider::before, .divider::after {
+  content: ''; position: absolute; top: 50%; width: 30%; height: 1rpx; background: #e5e6eb;
+}
+.divider::before { left: 4%; }
+.divider::after { right: 4%; }
+.wxbtn { margin-top: 10rpx; }
+.tip { text-align: center; font-size: 24rpx; margin-top: 30rpx; }

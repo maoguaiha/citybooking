@@ -1,0 +1,74 @@
+<!-- 商家/技师端：抢单大厅 + 我的接单 -->
+<view wx:if="{{isMerchant}}" class="page">
+  <view class="mtabs">
+    <view class="mtab {{merchantTab==='grab'?'on':''}}" data-tab="grab" bindtap="onMerchantTab">抢单大厅</view>
+    <view class="mtab {{merchantTab==='mine'?'on':''}}" data-tab="mine" bindtap="onMerchantTab">我的接单</view>
+  </view>
+
+  <view wx:if="{{loading && !grabList.length && !mineList.length}}" class="empty muted">加载中…</view>
+
+  <block wx:if="{{merchantTab==='grab'}}">
+    <view wx:if="{{!grabList.length}}" class="empty muted">暂无待抢订单</view>
+    <view class="card order" wx:for="{{grabList}}" wx:key="id" data-id="{{item.id}}" bindtap="goOrder">
+      <view class="o-head between">
+        <text class="o-title">{{item.serviceTitle}}</text>
+        <text class="o-status">{{item.statusLabel}}</text>
+      </view>
+      <view class="o-row muted">订单号 {{item.orderNo}}</view>
+      <view class="o-row muted" wx:if="{{item.address}}">地址 {{item.address}}</view>
+      <view class="o-row muted" wx:if="{{item.timeText}}">预约 {{item.timeText}}</view>
+      <view class="o-foot between">
+        <text class="price">¥{{item.amountText}}</text>
+        <button class="btn-primary grab" catchtap="grab" data-id="{{item.id}}">抢单</button>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view wx:if="{{!mineList.length}}" class="empty muted">暂无进行中订单</view>
+    <view class="card order" wx:for="{{mineList}}" wx:key="id" data-id="{{item.id}}" bindtap="goOrder">
+      <view class="o-head between">
+        <text class="o-title">{{item.serviceTitle}}</text>
+        <text class="o-status">{{item.statusLabel}}</text>
+      </view>
+      <view class="o-row muted">订单号 {{item.orderNo}}</view>
+      <view class="o-row muted" wx:if="{{item.address}}">地址 {{item.address}}</view>
+      <view class="o-foot between">
+        <text class="muted">{{item.timeText}}</text>
+        <text class="price">¥{{item.amountText}}</text>
+      </view>
+    </view>
+  </block>
+</view>
+
+<!-- 消费者端：服务浏览 -->
+<view wx:else class="page">
+  <view class="topbar">
+    <view class="search">
+      <text class="ico">🔍</text>
+      <input class="sinput" placeholder="搜索服务 / 商家" value="{{keyword}}" bindinput="onSearch" bindconfirm="onSearchConfirm" confirm-type="search" />
+    </view>
+    <view class="loc" bindtap="reloc">{{located ? '附近' : '默认城市'}}</view>
+  </view>
+
+  <scroll-view scroll-x class="cats" wx:if="{{categories.length}}">
+    <view class="cat {{activeCat===0?'on':''}}" data-id="0" bindtap="onCat">全部</view>
+    <view class="cat {{activeCat===item.id?'on':''}}" wx:for="{{categories}}" wx:key="id" data-id="{{item.id}}" bindtap="onCat">{{item.name}}</view>
+  </scroll-view>
+
+  <view wx:if="{{loading && !services.length}}" class="empty muted">加载中…</view>
+  <view wx:elif="{{!services.length}}" class="empty muted">暂无符合条件的服务</view>
+
+  <view class="list">
+    <view class="card svc" wx:for="{{services}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="svc-main">
+        <view class="svc-title">{{item.title}}</view>
+        <view class="svc-mer muted">{{item.merchantName}} · {{item.durationMin}}分钟</view>
+        <view class="svc-foot">
+          <text class="price">¥{{item.priceText}}</text>
+          <text class="muted" wx:if="{{item.distanceM !== null && item.distanceM !== undefined}}">距{{item.distanceM}}m</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

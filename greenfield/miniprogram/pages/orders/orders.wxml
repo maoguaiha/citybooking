@@ -1,0 +1,21 @@
+<view class="tabs">
+  <view class="tab {{tab===item.key?'on':''}}" wx:for="{{tabs}}" wx:key="key" data-key="{{item.key}}" bindtap="onTab">{{item.label}}</view>
+</view>
+
+<view wx:if="{{loading && !list.length}}" class="empty muted">加载中…</view>
+<view wx:elif="{{!list.length}}" class="empty muted">暂无订单</view>
+
+<view class="list">
+  <view class="card order" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+    <view class="o-head between">
+      <text class="o-title">{{item.serviceTitle || '服务订单'}}</text>
+      <text class="o-status">{{item.statusLabel}}</text>
+    </view>
+    <view class="o-row muted">订单号 {{item.orderNo}}</view>
+    <view class="o-row muted" wx:if="{{item.address}}">地址 {{item.address}}</view>
+    <view class="o-foot between">
+      <text class="muted">{{item.timeText}}</text>
+      <text class="price">¥{{item.amountText}}</text>
+    </view>
+  </view>
+</view>

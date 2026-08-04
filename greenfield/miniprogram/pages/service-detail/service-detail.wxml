@@ -1,0 +1,47 @@
+<view wx:if="{{svc}}" class="page">
+  <view class="card">
+    <view class="title">{{svc.title}}</view>
+    <view class="price">¥{{svc.priceText}}</view>
+    <view class="meta muted">时长 {{svc.durationMin}} 分钟 · 商家 {{svc.merchantName}}</view>
+    <view class="meta muted" wx:if="{{svc.description}}">{{svc.description}}</view>
+  </view>
+
+  <view class="card">
+    <view class="sec-title">撮合方式</view>
+    <view class="modes">
+      <view class="mode {{mode==='APPOINT'?'on':''}} {{!svc.merchantId?'disabled':''}}" data-mode="APPOINT" bindtap="onMode">
+        <view class="m-name">指定商家</view>
+        <view class="m-sub muted">由 {{svc.merchantName}} 接单</view>
+      </view>
+      <view class="mode {{mode==='GRAB'?'on':''}}" data-mode="GRAB" bindtap="onMode">
+        <view class="m-name">发单抢约</view>
+        <view class="m-sub muted">附近商家/技师抢单</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="sec-title">服务信息</view>
+    <view class="field">
+      <text class="label">服务地址</text>
+      <input class="input" placeholder="请输入上门地址" value="{{address}}" bindinput="onAddress" />
+    </view>
+    <view class="field">
+      <text class="label">预约日期</text>
+      <picker mode="date" value="{{date}}" bindchange="onDate">
+        <view class="picker">{{date || '选择日期'}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">预约时间</text>
+      <picker mode="time" value="{{time}}" bindchange="onTime">
+        <view class="picker">{{time || '选择时间'}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="bar">
+    <button class="btn-primary submit" loading="{{loading}}" bindtap="submit">立即预约</button>
+  </view>
+</view>
+<view wx:else class="empty muted">加载中…</view>

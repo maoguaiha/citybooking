@@ -1,0 +1,43 @@
+<view class="wrap">
+  <view class="brand">
+    <view class="logo">同</view>
+    <view class="title">同城预约</view>
+    <view class="sub">到家服务 · 一键预约</view>
+  </view>
+
+  <view class="tabs">
+    <view class="tab {{mode==='login'?'on':''}}" data-mode="login" bindtap="switchMode">登录</view>
+    <view class="tab {{mode==='register'?'on':''}}" data-mode="register" bindtap="switchMode">注册</view>
+  </view>
+
+  <view class="card form">
+    <view class="field">
+      <text class="label">手机号</text>
+      <input class="input" type="number" maxlength="11" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhone" />
+    </view>
+    <view class="field">
+      <text class="label">密码</text>
+      <input class="input" password placeholder="请输入密码" value="{{password}}" bindinput="onPassword" />
+    </view>
+
+    <block wx:if="{{mode==='register'}}">
+      <view class="field">
+        <text class="label">昵称</text>
+        <input class="input" placeholder="请输入昵称" value="{{nickname}}" bindinput="onNickname" />
+      </view>
+      <view class="field">
+        <text class="label">角色</text>
+        <picker mode="selector" range="{{roles}}" range-key="label" value="{{roleIndex}}" bindchange="onRole">
+          <view class="picker">{{roles[roleIndex].label}}</view>
+        </picker>
+      </view>
+    </block>
+
+    <button class="btn-primary submit" loading="{{loading}}" bindtap="submit">{{mode==='login'?'登 录':'注 册'}}</button>
+  </view>
+
+  <view class="divider"><text>或</text></view>
+  <button class="btn-ghost wxbtn" bindtap="wechatLogin">微信一键登录</button>
+
+  <view class="tip muted">登录即表示同意《用户协议》与《隐私政策》</view>
+</view>

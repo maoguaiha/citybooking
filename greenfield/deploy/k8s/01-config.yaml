@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: city-booking-config
+  namespace: city-booking
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  PAY_CHANNEL: "mock"
+  DB_HOST: "mysql.city-booking.svc.cluster.local"
+  DB_PORT: "3306"
+  DB_NAME: "booking"
+  REDIS_HOST: "redis.city-booking.svc.cluster.local"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  # JWT 等敏感信息请勿明文写入 ConfigMap，见下方 Secret
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: city-booking-secret
+  namespace: city-booking
+type: Opaque
+# 注意：以下为占位符。请在生产环境用真实值替换并 base64 编码：
+#   echo -n 'real-value' | base64
+stringData:
+  DB_USER: "booking"
+  DB_PASSWORD: "booking123"
+  REDIS_PASSWORD: ""
+  JWT_SECRET: "change-me-in-prod-0123456789abcdef"

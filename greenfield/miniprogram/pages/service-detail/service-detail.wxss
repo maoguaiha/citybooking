@@ -1,0 +1,21 @@
+.page { padding-bottom: 140rpx; }
+.title { font-size: 38rpx; font-weight: 700; }
+.price { font-size: 40rpx; margin: 12rpx 0; }
+.meta { font-size: 26rpx; margin-top: 8rpx; }
+.sec-title { font-size: 30rpx; font-weight: 600; margin-bottom: 20rpx; }
+
+.modes { display: flex; gap: 20rpx; }
+.mode { flex: 1; border: 2rpx solid #e5e6eb; border-radius: 16rpx; padding: 24rpx; }
+.mode.on { border-color: #07c160; background: #f0fff6; }
+.mode.disabled { opacity: .45; }
+.m-name { font-size: 30rpx; font-weight: 600; }
+.m-sub { font-size: 24rpx; margin-top: 8rpx; }
+
+.field { display: flex; align-items: center; padding: 22rpx 0; border-bottom: 1rpx solid #f0f0f0; }
+.label { width: 150rpx; font-size: 28rpx; }
+.input { flex: 1; font-size: 28rpx; }
+.picker { flex: 1; font-size: 28rpx; color: #1f2329; }
+
+.bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 16rpx 24rpx; background: #fff; border-top: 1rpx solid #f0f0f0; }
+.submit { width: 100%; }
+.empty { text-align: center; padding: 120rpx 0; }

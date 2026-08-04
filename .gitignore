@@ -1,0 +1,41 @@
+# ===== Maven / Java 构建产物 =====
+server/target/
+**/target/
+*.class
+*.jar
+*.war
+# 测试产生的 dump 流（surefire）
+*.dumpstream
+hs_err_pid*
+
+# ===== Node / 前端 构建产物 =====
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.webpack/
+.vite/
+**/.vite/
+*.tsbuildinfo
+
+# ===== 日志 / 临时 =====
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.cache/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.iml
+
+# ===== 运行时密钥（不入库） =====
+.env
+.env.local
+**/*.local
+
+# ===== 其他工具记忆 / 备份 =====
+.workbuddy/
+*.bkp
+.*.bkp

@@ -1,0 +1,97 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: city-booking-server
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: GMT+8
+  # ---- 开发/测试：H2 自举，无需外部中间件 ----
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:booking;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  # Redis/Redisson 仅在 prod 激活（见 prod profile）
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: ${REDIS_DB:0}
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-key-please-change-in-prod-1234567890}
+    expire-min: ${JWT_EXPIRE_MIN:120}
+  pay:
+    channel: ${PAY_CHANNEL:mock}
+  dispatch:
+    grab-timeout-min: ${GRAB_TIMEOUT_MIN:30}
+    default-radius-m: ${DEFAULT_RADIUS_M:5000}
+  refund:
+    rate-accepted: ${REFUND_RATE_ACCEPTED:0.8}
+  geo:
+    default-city: ${GEO_DEFAULT_CITY:北京}
+  wechat:
+    appid: ${WX_APPID:}
+    secret: ${WX_SECRET:}
+    mock: ${WX_MOCK:true}    # 开发/测试态为 true：code 直接映射为 mock openid，免真实微信配置
+
+logging:
+  level:
+    com.citybooking: debug
+    org.springframework.security: warn
+
+management:
+  health:
+    redis:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # Redis 在 prod 由 spring.redis.* 驱动（Redisson 与 RedisGeo 共用）
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: ${REDIS_DB:0}
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: GMT+8
+
+logging:
+  level:
+    com.citybooking: info
+    org.springframework.security: warn
+

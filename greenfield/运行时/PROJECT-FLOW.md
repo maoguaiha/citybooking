@@ -1,7 +1,7 @@
 # PROJECT-FLOW — 同城预约服务平台（里程碑：核心交易闭环 + 基建）
 
 > 机器可读块 ` ```machine ` 供 `运行时/gate.py` 解析。节点测试命令均为真实可跑命令。
-> 后端为单 Maven 模块 `server`（按域分包，微服务就绪），开发态 H2 自举，保证 gate 可绿。
+> 后端为单 Maven 模块 `citybooking/server`（按域分包，微服务就绪），开发态 H2 自举，保证 gate 可绿。代码已搬出 `greenfield/`（文档专用），全部程序位于 `citybooking/`。
 
 ## 节点总览
 
@@ -33,28 +33,28 @@ N0 ──► N1 ──► N2 ──► N3 ──► N4 ──► N5 ──► N6
 {
   "nodes": [
     {"id":"N0","name":"脚手架与基建","status":"in_progress",
-     "test":"mvn -q -f server test -Dtest=ScaffoldTest"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=ScaffoldTest"},
     {"id":"N1","name":"统一鉴权","status":"pending",
-     "test":"mvn -q -f server test -Dtest=AuthIntegrationIT"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=AuthIntegrationIT"},
     {"id":"N2","name":"领域模型","status":"pending",
-     "test":"mvn -q -f server test -Dtest=MerchantIntegrationIT"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=MerchantIntegrationIT"},
     {"id":"N3","name":"服务浏览搜索","status":"pending",
-     "test":"mvn -q -f server test -Dtest=ServiceSearchIT"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=ServiceSearchIT"},
     {"id":"N4","name":"下单与模拟支付","status":"pending",
-     "test":"mvn -q -f server test -Dtest=OrderPaymentIT"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=OrderPaymentIT"},
     {"id":"N5","name":"派单与接单","status":"pending",
-     "test":"mvn -q -f server test -Dtest=DispatchIT"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=DispatchIT"},
     {"id":"N6","name":"履约评价退款","status":"pending",
-     "test":"mvn -q -f server test -Dtest=FulfillmentIT"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=FulfillmentIT"},
     {"id":"N7","name":"平台管理后台","status":"pending",
-     "test":"mvn -q -f server test -Dtest=AdminIT"},
+     "test":"mvn -q -f ../citybooking/server test -Dtest=AdminIT"},
     {"id":"N8","name":"前端","status":"pending",
-     "test":"cd web && npm run build"},
+     "test":"cd ../citybooking/web && npm run build"},
     {"id":"N9","name":"部署验证","status":"pending",
-     "test":"mvn -q -f server test",
-     "build":"mvn -q -f server package -DskipTests"},
+     "test":"mvn -q -f ../citybooking/server test",
+     "build":"mvn -q -f ../citybooking/server package -DskipTests"},
     {"id":"N10","name":"小程序+自动化gate","status":"completed",
-     "test":"node miniprogram/scripts/gate.js"}
+     "test":"node ../citybooking/miniprogram/scripts/gate.js"}
   ]
 }
 ```

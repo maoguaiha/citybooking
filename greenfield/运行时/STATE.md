@@ -102,8 +102,8 @@ node_status:
 > 目标：为平台提供移动端入口，复用现有后端 `/api` 接口（JWT）。首版覆盖 消费者端 与 商家/技师端，并接入微信授权登录。
 
 ### 目录
-- `miniprogram/`：原生微信小程序（JS + WXML/WXSS），无构建步骤，可直接用微信开发者工具导入。
-- `miniprogram/scripts/gate.js`：小程序自动化 gate（校验全部 JS 语法 + JSON 可解析）。
+- `citybooking/miniprogram/`：原生微信小程序（JS + WXML/WXSS），无构建步骤，可直接用微信开发者工具导入。
+- `citybooking/miniprogram/scripts/gate.js`：小程序自动化 gate（校验全部 JS 语法 + JSON 可解析）。
 
 ### 页面与功能（按登录角色自适应）
 - `pages/login`：手机号+密码登录/注册（角色可选）、**微信一键登录**（`wx.login` → `/auth/wechat-login`，首次自动注册消费者）。
@@ -125,11 +125,24 @@ node_status:
 ### 接入说明
 - `utils/config.js` 的 `BASE_URL` 默认指向 `http://localhost:8080/api`；生产需改为 HTTPS 域名并在小程序后台「开发管理 → 服务器域名」配置 request 合法域名。
 - `project.config.json` 已设 `urlCheck:false`，开发者工具可直连本地后端（不校验域名）。
-- 运行：微信开发者工具 → 导入项目 → 选择 `miniprogram/` 目录（测试 AppID 用 `touristappid`）。
+- 运行：微信开发者工具 → 导入项目 → 选择 `citybooking/miniprogram/` 目录（测试 AppID 用 `touristappid`）。
 - 商家/技师要使用抢单/接单履约，需先在后端的 `/merchant/onboard` 完成入驻（`MERCHANT`/`TECHNICIAN`）。
 
+### 一键启动与本地验证（start-dev）
+> 目标：一条命令拉起后端 + 跑 gate + 实时冒烟，便于快速验证成果。
+
+- `citybooking/start-dev.cmd`（双击）或 `citybooking/start-dev.ps1`：一键启动脚本。
+  1. 若后端未运行，用 `citybooking/server/target/server-1.0.0.jar` 以 `dev` profile 启动（**H2 内存库自举，无需 MySQL/Redis；Redis 健康检查在 dev 下已禁用**）。
+  2. 就绪判定：端口连通且 `/auth/login` 返回任意 HTTP 响应即视为就绪（**勿用 `/actuator/health` 判活——安全配置会拦截该端点返回 403**）。
+  3. 运行小程序 gate（`node citybooking/miniprogram/scripts/gate.js`）。
+  4. 实时冒烟：随机手机号 `register` → `login` → `wechat-login`（mock，自动建号）→ 带 token 访问 `/auth/me`。
+  5. 若本机装有微信开发者工具，自动用其 CLI 打开 `citybooking/miniprogram/` 工程；否则打印「导入工程」步骤。
+- 注意：`citybooking/server/target/*.jar` 是构建产物（已被 `.gitignore` 忽略）。**改了后端 Java 后必须 `mvn package -DskipTests` 重新打包**，否则脚本会跑旧 jar（旧 jar 无 `wechat-login`，且旧安全配置可能 403）。
+- 停止后端：`Stop-Process -Name java`（或关掉其窗口）。H2 控制台：`http://127.0.0.1:8080/api/h2-console`。
+
 ### 自检
-- 小程序 gate（`node miniprogram/scripts/gate.js`/PROJ-FLOW 节点 N10）：校验 11 个 JS 语法 + 8 个 JSON，全部 PASS。
+- 小程序 gate（`node citybooking/miniprogram/scripts/gate.js`/PROJ-FLOW 节点 N10）：校验 11 个 JS 语法 + 8 个 JSON，全部 PASS。
+- 一键启动脚本 `citybooking/start-dev.ps1` 实测：后端以 dev/H2 启动就绪 → gate PASS → 实时冒烟 `register/login/wechat-login//auth/me` 全成功（最新 jar）。
 - 后端 `mvn test`：36 例全过（含 `WechatLoginIT`），BUILD SUCCESS。
 - 前端 `npm run build`：保持通过。
 - API 契约与 `web/src/lib/api.ts` 完全一致（含 `PageResult.records`、抢单/接单/履约接口），后端 RBAC 已生效。

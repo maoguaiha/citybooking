@@ -13,7 +13,7 @@ spring:
     time-zone: GMT+8
   # ---- 开发/测试：H2 自举，无需外部中间件 ----
   datasource:
-    url: ${DB_URL:jdbc:h2:mem:booking;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    url: ${DB_URL:jdbc:h2:mem:booking;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE}
     username: ${DB_USER:sa}
     password: ${DB_PASSWORD:}
     driver-class-name: org.h2.Driver

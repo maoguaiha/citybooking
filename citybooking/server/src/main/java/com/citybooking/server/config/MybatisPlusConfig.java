@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDateTime;
 
@@ -13,9 +15,19 @@ import java.time.LocalDateTime;
 public class MybatisPlusConfig {
 
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(
+            @Value("${spring.datasource.url:}") String dsUrl) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(com.baomidou.mybatisplus.annotation.DbType.MYSQL));
+        // Only enable MP's built-in pagination on MySQL.
+        // H2 embedded (dev/test) triggers SQLFeatureNotSupportedException in
+        // PaginationInnerInterceptor.prepare() even with H2 dialect — caused by
+        // H2's ProxyResultSet.getTimestamp() failing on TIMESTAMP columns.
+        // ServiceService uses manual selectList+slice as fallback.
+        boolean h2 = dsUrl.contains("h2:");
+        if (!h2) {
+            interceptor.addInnerInterceptor(new PaginationInnerInterceptor(
+                    com.baomidou.mybatisplus.annotation.DbType.MYSQL));
+        }
         return interceptor;
     }
 

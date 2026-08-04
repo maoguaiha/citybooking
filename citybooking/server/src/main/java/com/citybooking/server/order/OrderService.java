@@ -1,8 +1,7 @@
 package com.citybooking.server.order;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.citybooking.server.admin.AdminRoles;
 import com.citybooking.server.common.BizException;
 import com.citybooking.server.common.PageResult;
 import com.citybooking.server.common.ResultCode;
@@ -150,7 +149,7 @@ public class OrderService {
 
     public OrderView detail(Long orderId, Long uid, String role) {
         Order order = requireOrder(orderId);
-        if (!"ADMIN".equals(role) && !order.getConsumerId().equals(uid)) {
+        if (!AdminRoles.ALL.contains(role) && !order.getConsumerId().equals(uid)) {
             if ("MERCHANT".equals(role) || "TECHNICIAN".equals(role)) {
                 Merchant m = merchantService.merchantOf(uid);
                 if (!order.getMerchantId().equals(m.getId())) {
@@ -165,7 +164,7 @@ public class OrderService {
 
     public PageResult<OrderView> myOrders(Long uid, String role, String status, int page, int size) {
         var q = Wrappers.<Order>lambdaQuery();
-        if ("ADMIN".equals(role)) {
+        if (AdminRoles.ALL.contains(role)) {
             if (status != null) {
                 q.eq(Order::getStatus, status);
             }
@@ -182,9 +181,11 @@ public class OrderService {
             }
         }
         q.orderByDesc(Order::getCreatedAt);
-        IPage<Order> pg = orderMapper.selectPage(new Page<>(page, size), q);
-        List<OrderView> list = pg.getRecords().stream().map(this::toView).toList();
-        return PageResult.of(pg.getTotal(), page, size, list);
+        long total = orderMapper.selectCount(q);
+        int offset = (page - 1) * size;
+        List<Order> pageOrders = orderMapper.selectList(q.last("LIMIT " + size + " OFFSET " + offset));
+        List<OrderView> list = pageOrders.stream().map(this::toView).toList();
+        return PageResult.of(total, page, size, list);
     }
 
     private void broadcastGrab(Order order) {

@@ -23,6 +23,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+chcp 65001 | Out-Null          # 切换控制台到 UTF-8，避免中文提示乱码
 $root      = $PSScriptRoot
 $CONTAINER = 'mysql-cb'
 

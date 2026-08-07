@@ -40,10 +40,10 @@ Thumbs.db
 *.bkp
 .*.bkp
 
-# ===== 微信小程序本地私有配置 / 测试产物 =====
-miniprogram/project.private.config.json
-miniprogram/test/*.log
-miniprogram/test/y.txt
+# ===== 微信小程序本地私有配置 / 测试产物（实际位于 citybooking/ 下） =====
+citybooking/miniprogram/project.private.config.json
+citybooking/miniprogram/test/*.log
+citybooking/miniprogram/test/y.txt
 
 # ===== 自动化测试账号样例（非源码） =====
 cb_consumer.json

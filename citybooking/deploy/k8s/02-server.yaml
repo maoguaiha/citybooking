@@ -24,7 +24,7 @@ spec:
         - name: server
           image: registry.example.com/city-booking/server:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 18100
           envFrom:
             - configMapRef:
                 name: city-booking-config
@@ -36,13 +36,13 @@ spec:
           readinessProbe:
             httpGet:
               path: /api/actuator/health
-              port: 8080
+              port: 18100
             initialDelaySeconds: 20
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /api/actuator/health
-              port: 8080
+              port: 18100
             initialDelaySeconds: 40
             periodSeconds: 15
           resources:
@@ -62,5 +62,5 @@ spec:
   selector:
     app: city-booking-server
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 18100
+      targetPort: 18100

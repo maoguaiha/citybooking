@@ -18,7 +18,7 @@ spec:
               service:
                 name: city-booking-server
                 port:
-                  number: 8080
+                  number: 18100
           - path: /
             pathType: Prefix
             backend:

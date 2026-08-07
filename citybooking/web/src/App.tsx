@@ -43,7 +43,7 @@ export default function App() {
             </RequireAuth>
           }
         />
-        <Route path="/admin" element={<RequireAuth roles={['ADMIN']}><Admin /></RequireAuth>} />
+        <Route path="/admin" element={<RequireAuth roles={['ADMIN', 'SUPER_ADMIN']}><Admin /></RequireAuth>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -101,15 +101,19 @@ public class MerchantService {
 
     public MerchantView view(Merchant merchant) {
         return new MerchantView(merchant.getId(), merchant.getName(), merchant.getAddress(),
-                merchant.getLng(), merchant.getLat(), merchant.getRadius(), merchant.getStatus(), merchant.getRating());
+                merchant.getLng(), merchant.getLat(), merchant.getRadius(), merchant.getStatus(),
+                merchant.getRating(), merchant.getRejectReason());
     }
 
-    public void audit(Long merchantId, boolean approve) {
+    public void audit(Long merchantId, boolean approve, String reason) {
         Merchant merchant = merchantMapper.selectById(merchantId);
         if (merchant == null) {
             throw new BizException(ResultCode.NOT_FOUND, "商家不存在");
         }
         merchant.setStatus(approve ? "APPROVED" : "REJECTED");
+        if (!approve) {
+            merchant.setRejectReason(reason);
+        }
         merchantMapper.updateById(merchant);
         technicianMapper.selectList(Wrappers.<Technician>lambdaQuery().eq(Technician::getMerchantId, merchantId))
                 .forEach(t -> {

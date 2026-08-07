@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -22,9 +23,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public abstract class BaseIT {
 
     protected static final String BASE = "";
+
+    /** 种子超级管理员（由 DataInitializer 播种，见 application 默认配置）。 */
+    protected static final String ADMIN_PHONE = "10000000000";
+    protected static final String ADMIN_PWD = "Admin@123456";
 
     @Autowired
     private TestRestTemplate autowiredRest;
@@ -81,9 +87,16 @@ public abstract class BaseIT {
         return readData(r.getBody(), "token");
     }
 
+    /** 登录种子超级管理员，返回其 JWT。 */
+    protected String adminToken() {
+        ResponseEntity<String> r = rest.exchange(BASE + "/auth/login", HttpMethod.POST,
+                json(Map.of("phone", ADMIN_PHONE, "password", ADMIN_PWD)), String.class);
+        return readData(r.getBody(), "token");
+    }
+
     protected Fixture setupMerchant() {
         Fixture f = new Fixture();
-        f.adminToken = token(uniqPhone("a"), "pwd123", "ADMIN");
+        f.adminToken = adminToken();
         f.merchantToken = token(uniqPhone("m"), "pwd123", "MERCHANT");
         f.consumerToken = token(uniqPhone("c"), "pwd123", "CONSUMER");
         f.categoryId = post("/admin/categories?name=测试类目", null, f.adminToken, Long.class);

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import * as api from './api'
 
-export type Role = 'CONSUMER' | 'MERCHANT' | 'TECHNICIAN' | 'ADMIN'
+export type Role = 'CONSUMER' | 'MERCHANT' | 'TECHNICIAN' | 'ADMIN' | 'SUPER_ADMIN'
 
 interface AuthState {
   token: string | null
@@ -88,6 +88,7 @@ export const homeForRole = (role?: string): string => {
     case 'TECHNICIAN':
       return '/merchant'
     case 'ADMIN':
+    case 'SUPER_ADMIN':
       return '/admin'
     default:
       return '/'

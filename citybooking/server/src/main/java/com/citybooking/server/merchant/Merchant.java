@@ -18,4 +18,5 @@ public class Merchant extends BaseEntity {
     private Integer radius; // 服务半径（米）
     private String status;  // PENDING / APPROVED / REJECTED
     private Double rating = 0.0;
+    private String rejectReason; // 审核拒绝原因
 }

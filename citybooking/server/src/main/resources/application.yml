@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 18100
   servlet:
     context-path: /api
 
@@ -11,16 +11,6 @@ spring:
   jackson:
     default-property-inclusion: non_null
     time-zone: GMT+8
-  # ---- 开发/测试：H2 自举，无需外部中间件 ----
-  datasource:
-    url: ${DB_URL:jdbc:h2:mem:booking;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE}
-    username: ${DB_USER:sa}
-    password: ${DB_PASSWORD:}
-    driver-class-name: org.h2.Driver
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
   # Redis/Redisson 仅在 prod 激活（见 prod profile）
   redis:
     host: ${REDIS_HOST:localhost}
@@ -71,6 +61,47 @@ management:
         include: health,info
 
 ---
+
+# ========== 开发环境：本地 MySQL（数据持久化，重启不丢失，解决 ID 失效 404） ==========
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/citybooking_dev?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-mysql.sql
+  h2:
+    console:
+      enabled: false
+
+# ========== 测试环境：仍用 H2 内存库（CI 无需外部中间件，隔离开发库） ==========
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:booking;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# ========== 生产环境：MySQL + Redis ==========
+---
 spring:
   config:
     activate:
@@ -80,6 +111,10 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-mysql.sql
   # Redis 在 prod 由 spring.redis.* 驱动（Redisson 与 RedisGeo 共用）
   redis:
     host: ${REDIS_HOST}

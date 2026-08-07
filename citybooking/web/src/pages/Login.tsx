@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, User, Store, Wrench, ShieldCheck, ArrowRight } from 'lucide-react'
-import { useAuth, type Role } from '../lib/auth'
+import { MapPin, User, Store, Wrench, ArrowRight } from 'lucide-react'
+import { useAuth, type Role, homeForRole } from '../lib/auth'
+import * as api from '../lib/api'
 import { Button, Field, Input } from '../lib/ui'
 
+// 管理员（ADMIN/SUPER_ADMIN）由后台初始化，不支持自助注册，故不在注册角色列表中
 const ROLES: { value: Role; label: string; icon: typeof User; desc: string }[] = [
   { value: 'CONSUMER', label: '我是消费者', icon: User, desc: '预约上门服务' },
   { value: 'MERCHANT', label: '我是商家', icon: Store, desc: '入驻接单经营' },
   { value: 'TECHNICIAN', label: '我是独立技师', icon: Wrench, desc: '凭手艺接单' },
-  { value: 'ADMIN', label: '平台管理员', icon: ShieldCheck, desc: '审核与运营' },
 ]
 
 const DEMO = { phone: '13800000001', password: 'demo1234' }
@@ -31,11 +32,13 @@ export default function Login() {
     try {
       if (mode === 'login') {
         await login(phone, password)
+        const u = await api.me()
+        nav(homeForRole(u.role))
       } else {
         if (!nickname.trim()) throw new Error('请填写昵称')
         await register(phone, password, nickname.trim(), role)
+        nav(homeForRole(role))
       }
-      nav(role === 'CONSUMER' ? '/' : role === 'ADMIN' ? '/admin' : '/merchant')
     } catch (e2) {
       setErr((e2 as Error).message)
     } finally {

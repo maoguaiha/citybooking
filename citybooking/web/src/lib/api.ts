@@ -69,6 +69,7 @@ export interface MerchantView {
   radius: number | null
   status: string
   rating: number
+  rejectReason?: string | null
 }
 export interface OrderView {
   id: number
@@ -202,8 +203,8 @@ export const myServices = () => request<ServiceView[]>({ method: 'GET', url: '/m
 export const merchantProfile = () => request<MerchantView>({ method: 'GET', url: '/merchant/profile' })
 
 /* ---------- 管理员 ---------- */
-export const adminAudit = (id: number, approve: boolean) =>
-  request<void>({ method: 'POST', url: `/admin/merchants/${id}/audit`, params: { approve } })
+export const adminAudit = (id: number, approve: boolean, reason?: string) =>
+  request<void>({ method: 'POST', url: `/admin/merchants/${id}/audit`, params: { approve, reason } })
 
 export const adminMerchants = (status?: string) =>
   request<MerchantView[]>({ method: 'GET', url: '/admin/merchants', params: { status } })
@@ -211,8 +212,94 @@ export const adminMerchants = (status?: string) =>
 export const createCategory = (name: string, parentId?: number, sort?: number) =>
   request<number>({ method: 'POST', url: '/admin/categories', params: { name, parentId, sort } })
 
-export const adminOrders = (status?: string) =>
-  request<OrderView[]>({ method: 'GET', url: '/admin/orders', params: { status } })
+export const adminOrders = (params?: { page?: number; size?: number; keyword?: string; status?: string }) =>
+  request<PageResult<OrderView>>({ method: 'GET', url: '/admin/orders', params })
+
+export const adminOrderDetail = (id: number) =>
+  request<OrderView>({ method: 'GET', url: `/admin/orders/${id}` })
 
 export const adminRefundApprove = (orderId: number) =>
   request<void>({ method: 'POST', url: `/admin/refunds/${orderId}/approve` })
+
+export const adminRefundReject = (orderId: number) =>
+  request<void>({ method: 'POST', url: `/admin/refunds/${orderId}/reject` })
+
+export interface DashboardView {
+  todayOrderCount: number
+  todayGmv: number
+  totalUsers: number
+  totalMerchants: number
+  pendingMerchants: number
+  totalTechnicians: number
+  pendingRefunds: number
+  totalServices: number
+}
+
+export const adminDashboard = () => request<DashboardView>({ method: 'GET', url: '/admin/dashboard' })
+
+export interface UserView {
+  id: number
+  phone: string
+  nickname: string
+  status: number
+  createdAt: string
+}
+
+export const adminUsers = (params?: { page?: number; size?: number; keyword?: string; status?: number }) =>
+  request<PageResult<UserView>>({ method: 'GET', url: '/admin/users', params })
+
+export const banUser = (id: number) => request<void>({ method: 'POST', url: `/admin/users/${id}/ban` })
+
+export const unbanUser = (id: number) => request<void>({ method: 'POST', url: `/admin/users/${id}/unban` })
+
+export const adminUserOrders = (id: number, params?: { page?: number; size?: number }) =>
+  request<PageResult<OrderView>>({ method: 'GET', url: `/admin/users/${id}/orders`, params })
+
+export interface TechnicianView {
+  id: number
+  name: string
+  skill: string
+  status: string
+  rating: number
+  merchantId: number | null
+}
+
+export const adminTechnicians = (params?: { page?: number; size?: number; keyword?: string; status?: string }) =>
+  request<PageResult<TechnicianView>>({ method: 'GET', url: '/admin/technicians', params })
+
+export const enableTechnician = (id: number) =>
+  request<void>({ method: 'POST', url: `/admin/technicians/${id}/enable` })
+
+export const disableTechnician = (id: number) =>
+  request<void>({ method: 'POST', url: `/admin/technicians/${id}/disable` })
+
+export interface ServiceView {
+  id: number
+  title: string
+  price: number
+  status: string
+  merchantId: number
+  categoryId: number
+}
+
+export const adminServices = (params?: { page?: number; size?: number; keyword?: string; status?: string }) =>
+  request<PageResult<ServiceView>>({ method: 'GET', url: '/admin/services', params })
+
+export const offlineService = (id: number) =>
+  request<void>({ method: 'POST', url: `/admin/services/${id}/offline` })
+
+export const restoreService = (id: number) =>
+  request<void>({ method: 'POST', url: `/admin/services/${id}/restore` })
+
+export interface AdminView {
+  id: number
+  phone: string
+  nickname: string
+  role: string
+  status: number
+}
+
+export const adminAdmins = () => request<AdminView[]>({ method: 'GET', url: '/admin/admins' })
+
+export const createAdmin = (data: { phone: string; password: string; nickname?: string }) =>
+  request<AdminView>({ method: 'POST', url: '/admin/admins', data })

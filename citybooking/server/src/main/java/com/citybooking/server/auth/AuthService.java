@@ -3,6 +3,7 @@ package com.citybooking.server.auth;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.citybooking.server.common.BizException;
 import com.citybooking.server.common.ResultCode;
+import com.citybooking.server.admin.AdminRoles;
 import com.citybooking.server.common.SecurityUtil;
 import com.citybooking.server.config.JwtTokenProvider;
 import com.citybooking.server.dto.AuthDto.AuthResp;
@@ -19,7 +20,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private static final Set<String> ROLES = Set.of("CONSUMER", "MERCHANT", "TECHNICIAN", "ADMIN");
+    private static final Set<String> SELF_REGISTERABLE = AdminRoles.SELF_REGISTERABLE;
     private static final String PHONE_RE = "^1[3-9]\\d{9}$";
 
     private final UserMapper userMapper;
@@ -31,8 +32,8 @@ public class AuthService {
         if (req.phone() == null || !req.phone().matches(PHONE_RE)) {
             throw new BizException(ResultCode.BAD_REQUEST, "手机号格式不正确");
         }
-        if (req.role() == null || !ROLES.contains(req.role())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "角色不合法");
+        if (req.role() == null || !SELF_REGISTERABLE.contains(req.role())) {
+            throw new BizException(ResultCode.BAD_REQUEST, "角色不合法，管理员账号不可自助注册");
         }
         if (userMapper.selectCount(Wrappers.<User>lambdaQuery().eq(User::getPhone, req.phone())) > 0) {
             throw new BizException(ResultCode.CONFLICT, "手机号已注册");

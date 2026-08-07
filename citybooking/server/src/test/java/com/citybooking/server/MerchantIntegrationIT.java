@@ -14,7 +14,7 @@ public class MerchantIntegrationIT extends BaseIT {
 
     @Test
     void publishRequiresApproval() {
-        String admin = token(uniqPhone("a"), "pwd123", "ADMIN");
+        String admin = adminToken();
         String merchant = token(uniqPhone("m"), "pwd123", "MERCHANT");
         Long cat = post("/admin/categories?name=cat", null, admin, Long.class);
         Long mid = post("/merchant/onboard", Map.of(

@@ -36,7 +36,7 @@ public class MerchantDto {
     }
 
     public record MerchantView(Long id, String name, String address, Double lng, Double lat,
-                               Integer radius, String status, Double rating) {
+                               Integer radius, String status, Double rating, String rejectReason) {
     }
 
     public record ServiceView(Long id, Long merchantId, Long technicianId, Long categoryId,

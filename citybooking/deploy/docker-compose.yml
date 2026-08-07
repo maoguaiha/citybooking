@@ -45,7 +45,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-me-in-prod-0123456789abcdef}
       PAY_CHANNEL: mock
     ports:
-      - "8080:8080"
+      - "18100:18100"
     depends_on:
       mysql:
         condition: service_healthy

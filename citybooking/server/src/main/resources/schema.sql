@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS merchant (
     radius INT,
     status VARCHAR(20),
     rating DOUBLE,
+    reject_reason VARCHAR(255),
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     deleted INT DEFAULT 0

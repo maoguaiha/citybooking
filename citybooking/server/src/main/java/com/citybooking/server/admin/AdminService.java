@@ -55,8 +55,8 @@ public class AdminService {
 
     private static final String PHONE_RE = "^1[3-9]\\d{9}$";
 
-    public void auditMerchant(Long merchantId, boolean approve) {
-        merchantService.audit(merchantId, approve);
+    public void auditMerchant(Long merchantId, boolean approve, String reason) {
+        merchantService.audit(merchantId, approve, reason);
     }
 
     public List<MerchantView> listMerchants(String status) {
@@ -67,7 +67,7 @@ public class AdminService {
         q.orderByDesc(Merchant::getId);
         return merchantMapper.selectList(q).stream()
                 .map(m -> new MerchantView(m.getId(), m.getName(), m.getAddress(), m.getLng(),
-                        m.getLat(), m.getRadius(), m.getStatus(), m.getRating()))
+                        m.getLat(), m.getRadius(), m.getStatus(), m.getRating(), m.getRejectReason()))
                 .toList();
     }
 
@@ -84,13 +84,28 @@ public class AdminService {
         return categoryMapper.selectList(Wrappers.<Category>lambdaQuery().orderByAsc(Category::getSort));
     }
 
-    public List<OrderView> listOrders(String status) {
+    public PageResult<OrderView> listOrders(int page, int size, String keyword, String status) {
         var q = Wrappers.<Order>lambdaQuery();
-        if (status != null) {
+        if (keyword != null && !keyword.isBlank()) {
+            q.like(Order::getOrderNo, keyword);
+        }
+        if (status != null && !status.isBlank()) {
             q.eq(Order::getStatus, status);
         }
-        q.orderByDesc(Order::getCreatedAt);
-        return orderMapper.selectList(q).stream().map(orderService::toView).toList();
+        long total = orderMapper.selectCount(q);
+        q.orderByDesc(Order::getId);
+        int offset = (page - 1) * size;
+        List<Order> orders = orderMapper.selectList(q.last("LIMIT " + size + " OFFSET " + offset));
+        return new PageResult<>(total, page, size,
+                orders.stream().map(orderService::toView).toList());
+    }
+
+    public OrderView orderDetail(Long id) {
+        Order order = orderMapper.selectById(id);
+        if (order == null) {
+            throw new BizException(ResultCode.NOT_FOUND, "订单不存在");
+        }
+        return orderService.toView(order);
     }
 
     public void refundApprove(Long orderId) {
@@ -114,6 +129,19 @@ public class AdminService {
         } else {
             throw new BizException(ResultCode.BAD_REQUEST, "该订单状态不支持仲裁退款");
         }
+    }
+
+    public void refundReject(Long orderId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new BizException(ResultCode.NOT_FOUND, "订单不存在");
+        }
+        if ("NONE".equals(order.getRefundStatus()) || "REFUNDED".equals(order.getStatus())) {
+            throw new BizException(ResultCode.BAD_REQUEST, "该订单无可拒绝的退款");
+        }
+        order.setRefundStatus("REJECTED");
+        orderMapper.updateById(order);
+        noticeService.send(order.getConsumerId(), "REFUND_REJECTED", Map.of("orderId", orderId));
     }
 
     // ===== 管理员账号管理（仅 SUPER_ADMIN 可调用，见 AdminController） =====
@@ -293,5 +321,48 @@ public class AdminService {
         }
         technicianMapper.update(null, Wrappers.<Technician>lambdaUpdate()
                 .eq(Technician::getId, id).set(Technician::getStatus, status));
+    }
+
+    // ===== 服务内容治理 =====
+
+    public record ServiceView(Long id, String title, BigDecimal price, String status,
+                              Long merchantId, Long categoryId) {
+    }
+
+    public PageResult<ServiceView> listServices(int page, int size, String keyword, String status) {
+        var q = Wrappers.<ServiceItem>lambdaQuery().eq(ServiceItem::getDeleted, 0);
+        if (keyword != null && !keyword.isBlank()) {
+            q.like(ServiceItem::getTitle, keyword);
+        }
+        if (status != null && !status.isBlank()) {
+            q.eq(ServiceItem::getStatus, status);
+        }
+        long total = serviceItemMapper.selectCount(q);
+        q.orderByDesc(ServiceItem::getId);
+        int offset = (page - 1) * size;
+        List<ServiceItem> items = serviceItemMapper.selectList(q.last("LIMIT " + size + " OFFSET " + offset));
+        return new PageResult<>(total, page, size,
+                items.stream().map(s -> new ServiceView(
+                        s.getId(), s.getTitle(), s.getPrice(), s.getStatus(),
+                        s.getMerchantId(), s.getCategoryId()))
+                        .toList());
+    }
+
+    @Transactional
+    public void offlineService(Long id) {
+        setServiceStatus(id, "OFF");
+    }
+
+    @Transactional
+    public void restoreService(Long id) {
+        setServiceStatus(id, "ON");
+    }
+
+    private void setServiceStatus(Long id, String status) {
+        if (serviceItemMapper.selectById(id) == null) {
+            throw new BizException(ResultCode.NOT_FOUND, "服务不存在");
+        }
+        serviceItemMapper.update(null, Wrappers.<ServiceItem>lambdaUpdate()
+                .eq(ServiceItem::getId, id).set(ServiceItem::getStatus, status));
     }
 }

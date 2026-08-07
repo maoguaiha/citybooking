@@ -49,3 +49,6 @@ miniprogram/test/y.txt
 cb_consumer.json
 cb_merchant.json
 cb_tech.json
+
+# ===== greenfield：开发方法论/参考文档，不随产品源码发布 =====
+greenfield/
